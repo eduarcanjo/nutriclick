@@ -591,7 +591,8 @@ function atualizarTrilha(passo){
 
 // ================== PÁGINA 1 ==================
 function aceitarCompromisso(){
-  enviar({ etapa_atual:'2 - Dados pessoais', quiz_completo:'Não' });
+  // Nenhum dado é gravado aqui: o lead só é criado quando
+  // nome, telefone e e-mail forem preenchidos no passo seguinte.
   irPara('pg2');
 }
 
@@ -711,7 +712,7 @@ document.getElementById('btnWhats').href =
   'https://wa.me/' + NUMERO_WHATSAPP_EQUIPE + '?text=' + encodeURIComponent(MSG_WHATSAPP);
 
 // ================== INÍCIO ==================
-enviar({ etapa_atual:'1 - Compromisso', quiz_completo:'Não' });
+// O lead só é criado na planilha após validar nome, telefone e e-mail (passo 2).
 atualizarTrilha(1);
 
 // Atalho de teste: ?final abre a última página
