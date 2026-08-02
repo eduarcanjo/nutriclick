@@ -189,6 +189,12 @@ h1,h2{font-family:'Fraunces',serif;font-weight:900;text-transform:lowercase}
 .mini-pdf{background:var(--verde-profundo);color:var(--creme)}
 .mini-insta{background:linear-gradient(45deg,#F58529,#DD2A7B,#8134AF);color:#fff}
 .mini-whats{background:#25D366;color:#fff}
+.mini-excluir{
+  flex:0 0 auto;
+  width:42px;
+  background:#F5DCDC;color:#7A2222;
+}
+.mini-excluir:hover{background:#EFC7C7}
 .vazio{
   text-align:center;
   padding:60px 20px;
@@ -515,6 +521,10 @@ function htmlCard(l, draggable){
         'onclick="event.stopPropagation();exportarPDF(\''+esc(l.id_lead)+'\')">'+
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15l3 3 3-3"/></svg>'+
         'PDF</button>'+
+      '<button class="mini mini-excluir" title="Excluir lead" draggable="false" '+
+        'onclick="event.stopPropagation();pedirExclusao(\''+esc(l.id_lead)+'\')">'+
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>'+
+        '</button>'+
       (insta ?
       '<a class="mini mini-insta" title="Abrir Instagram" draggable="false" href="'+insta+'" target="_blank" rel="noopener" '+
         'onclick="event.stopPropagation()">'+
@@ -686,6 +696,48 @@ function exportarPDF(idLead){
   janela.document.close();
 }
 
+// ================== EXCLUIR LEAD ==================
+var idParaExcluir = null;
+
+function pedirExclusao(idLead){
+  var l = leads.find(function(x){ return String(x.id_lead) === String(idLead); });
+  if(!l) return;
+  idParaExcluir = idLead;
+  document.getElementById('conteudoModal').innerHTML =
+    '<h2>excluir lead?</h2>'+
+    '<div class="sub">Essa ação apaga <strong>'+(esc(l.nome)||'este lead sem nome')+'</strong> do painel e da planilha. Não dá para desfazer.</div>'+
+    '<div class="acoes">'+
+    '<button class="btn" style="background:#7A2222;color:#fff" onclick="confirmarExclusao()">Sim, excluir</button>'+
+    '<button class="btn btn-suave" onclick="fecharModal()">Não</button>'+
+    '</div>';
+  document.getElementById('fundoModal').classList.add('aberto');
+}
+
+function confirmarExclusao(){
+  if(!idParaExcluir) return;
+  var id = idParaExcluir;
+  idParaExcluir = null;
+  fecharModal();
+
+  // remove do painel na hora
+  leads = leads.filter(function(l){ return String(l.id_lead) !== String(id); });
+  renderResumo();
+  renderizar();
+
+  // apaga da planilha
+  fetch(URL_BACKEND, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({ acao:'excluirLead', senha:senha, id_lead:id })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(res){
+    if(res.ok) mostrarToast('Lead excluído da planilha');
+    else { mostrarToast('Erro ao excluir: ' + (res.erro||'')); carregarLeads(); }
+  })
+  .catch(function(){ mostrarToast('Erro de conexão ao excluir. Atualize o painel.'); });
+}
+
 // ================== MODAL ==================
 function abrirModal(idLead){
   var l = leads.find(function(x){ return String(x.id_lead) === String(idLead); });
@@ -755,6 +807,7 @@ function mudarStatusModal(){
 function fecharModal(){
   document.getElementById('fundoModal').classList.remove('aberto');
   leadAberto = null;
+  idParaExcluir = null;
 }
 </script>
 </body>
