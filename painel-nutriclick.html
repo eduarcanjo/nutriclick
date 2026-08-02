@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Leads | Nutri Click</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde-profundo:#0B4F44;
+  --verde-vivo:#57C4AF;
+  --creme:#F2EDE0;
+  --grafite:#1A1A1A;
+  --branco:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Archivo',sans-serif;
+  background:var(--creme);
+  color:var(--grafite);
+  min-height:100vh;
+}
+h1,h2{font-family:'Fraunces',serif;font-weight:900;text-transform:lowercase}
+
+/* ============ LOGIN ============ */
+#telaLogin{
+  position:fixed;inset:0;
+  background:var(--verde-profundo);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;z-index:100;
+}
+.caixa-login{
+  background:var(--creme);
+  border-radius:22px;
+  padding:36px 30px;
+  width:100%;max-width:380px;
+  text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
+.caixa-login h1{color:var(--verde-profundo);font-size:26px;margin-bottom:6px}
+.caixa-login p{font-size:14px;color:rgba(26,26,26,.65);margin-bottom:20px}
+.caixa-login input{
+  width:100%;
+  font-family:'Archivo',sans-serif;
+  font-size:16px;
+  padding:14px 16px;
+  border-radius:12px;
+  border:2px solid rgba(11,79,68,.2);
+  outline:none;
+  text-align:center;
+  margin-bottom:14px;
+  transition:border-color .2s;
+}
+.caixa-login input:focus{border-color:var(--verde-vivo)}
+.erro-login{color:#c0392b;font-size:13px;margin-bottom:12px;display:none}
+.erro-login.mostrar{display:block}
+
+/* ============ BOTÕES ============ */
+.btn{
+  font-family:'Archivo',sans-serif;
+  font-size:15px;font-weight:600;
+  padding:13px 22px;
+  border-radius:12px;
+  border:none;cursor:pointer;
+  transition:all .18s ease;
+  text-decoration:none;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn:active{transform:scale(.97)}
+.btn-principal{background:var(--verde-profundo);color:var(--creme)}
+.btn-principal:hover{background:#0d5f52}
+.btn-suave{background:rgba(11,79,68,.1);color:var(--verde-profundo)}
+.btn-suave:hover{background:rgba(11,79,68,.18)}
+.btn-suave.ativo{background:var(--verde-profundo);color:var(--creme)}
+/* Abas dentro do header verde: precisam de contraste no fundo escuro */
+.topo .btn-suave{background:rgba(242,237,224,.14);color:var(--creme)}
+.topo .btn-suave:hover{background:rgba(242,237,224,.24)}
+.topo .btn-suave.ativo{background:var(--creme);color:var(--verde-profundo)}
+.btn-whats{background:#25D366;color:#fff;width:100%}
+.btn-whats:hover{background:#1fbd5a}
+
+/* ============ TOPO ============ */
+.topo{
+  background:var(--verde-profundo);
+  padding:18px 20px 16px;
+  position:sticky;top:0;z-index:20;
+  box-shadow:0 4px 18px rgba(0,0,0,.15);
+}
+.topo-inner{
+  max-width:1500px;margin:0 auto;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.topo h1{color:var(--creme);font-size:22px;flex:1;white-space:nowrap}
+.topo h1 span{color:var(--verde-vivo)}
+.abas{display:flex;gap:8px}
+.busca{
+  flex-basis:100%;
+  margin-top:4px;
+}
+.busca input{
+  width:100%;
+  font-family:'Archivo',sans-serif;
+  font-size:15px;
+  padding:12px 16px;
+  border-radius:12px;
+  border:none;
+  outline:none;
+  background:rgba(242,237,224,.12);
+  color:var(--creme);
+}
+.busca input::placeholder{color:rgba(242,237,224,.5)}
+.busca input:focus{background:rgba(242,237,224,.2)}
+
+/* ============ RESUMO ============ */
+.resumo{
+  max-width:1500px;margin:18px auto 0;
+  padding:0 20px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;
+}
+.resumo .caixa{
+  background:var(--branco);
+  border-radius:16px;
+  padding:16px;
+  border:1px solid rgba(11,79,68,.08);
+}
+.resumo .num{font-family:'Fraunces',serif;font-weight:900;font-size:28px;color:var(--verde-profundo)}
+.resumo .rot{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:rgba(26,26,26,.55);margin-top:2px}
+
+/* ============ CARDS ============ */
+.area{max-width:1500px;margin:18px auto 60px;padding:0 20px}
+.grade-cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
+  gap:14px;
+}
+.lead-card{
+  background:var(--branco);
+  border-radius:16px;
+  padding:18px;
+  border:1px solid rgba(11,79,68,.1);
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.lead-card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(11,79,68,.14)}
+.lead-card.incompleto{
+  background:#FFF4E5;
+  border-color:#F0B65B;
+}
+.lead-card .nome{font-weight:700;font-size:16px;color:var(--verde-profundo);margin-bottom:4px}
+.lead-card .info{font-size:13px;color:rgba(26,26,26,.65);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{
+  display:inline-block;
+  font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.04em;
+  padding:5px 10px;border-radius:99px;
+  margin-top:10px;
+}
+.tag-incompleto{
+  display:inline-block;
+  font-size:11px;font-weight:700;
+  padding:5px 10px;border-radius:99px;
+  margin-top:10px;margin-left:6px;
+  background:#F0B65B;color:#5c3d00;
+}
+.card-acoes{
+  display:flex;gap:8px;
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid rgba(11,79,68,.1);
+}
+.mini{
+  flex:1;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  font-family:'Archivo',sans-serif;
+  font-size:12px;font-weight:700;
+  padding:8px 6px;
+  border-radius:10px;
+  border:none;cursor:pointer;
+  text-decoration:none;
+  transition:filter .15s ease, transform .1s ease;
+}
+.mini:hover{filter:brightness(1.08)}
+.mini:active{transform:scale(.96)}
+.mini svg{width:15px;height:15px;flex-shrink:0}
+.mini-pdf{background:var(--verde-profundo);color:var(--creme)}
+.mini-insta{background:linear-gradient(45deg,#F58529,#DD2A7B,#8134AF);color:#fff}
+.mini-whats{background:#25D366;color:#fff}
+.vazio{
+  text-align:center;
+  padding:60px 20px;
+  color:rgba(26,26,26,.5);
+  font-size:15px;
+}
+
+/* ============ KANBAN ============ */
+.kanban{
+  display:flex;gap:14px;
+  overflow-x:auto;
+  padding-bottom:20px;
+  align-items:flex-start;
+}
+.coluna{
+  min-width:265px;width:265px;
+  background:rgba(11,79,68,.06);
+  border-radius:16px;
+  padding:12px;
+  flex-shrink:0;
+}
+.coluna.arrastando-sobre{background:rgba(87,196,175,.22);outline:2px dashed var(--verde-vivo)}
+.coluna-titulo{
+  display:flex;align-items:center;justify-content:space-between;
+  font-weight:700;font-size:13px;
+  text-transform:uppercase;letter-spacing:.04em;
+  padding:4px 6px 12px;
+}
+.coluna-titulo .cont{
+  background:var(--branco);
+  border-radius:99px;
+  padding:2px 9px;
+  font-size:12px;
+  color:var(--verde-profundo);
+}
+.coluna .lead-card{margin-bottom:10px;cursor:grab}
+.coluna .lead-card:active{cursor:grabbing}
+.coluna .lead-card.arrastando{opacity:.4}
+
+/* ============ MODAL ============ */
+#fundoModal{
+  position:fixed;inset:0;
+  background:rgba(11,79,68,.55);
+  backdrop-filter:blur(3px);
+  display:none;
+  align-items:flex-end;justify-content:center;
+  z-index:50;
+  padding:0;
+}
+#fundoModal.aberto{display:flex}
+.modal{
+  background:var(--creme);
+  border-radius:22px 22px 0 0;
+  width:100%;max-width:560px;
+  max-height:88vh;
+  overflow-y:auto;
+  padding:26px 24px 34px;
+  animation:sobe .3s ease both;
+}
+@keyframes sobe{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media(min-width:640px){
+  #fundoModal{align-items:center;padding:20px}
+  .modal{border-radius:22px}
+}
+.modal h2{color:var(--verde-profundo);font-size:24px;margin-bottom:2px}
+.modal .sub{font-size:13px;color:rgba(26,26,26,.55);margin-bottom:18px}
+.dado{
+  background:var(--branco);
+  border-radius:12px;
+  padding:12px 14px;
+  margin-bottom:8px;
+  font-size:14px;
+}
+.dado .rotulo{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:rgba(26,26,26,.5);margin-bottom:2px}
+.dado a{color:var(--verde-profundo);font-weight:600;word-break:break-all}
+.modal .campo-status{margin:16px 0}
+.modal .campo-status label{font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--verde-profundo);display:block;margin-bottom:8px}
+.modal select{
+  width:100%;
+  font-family:'Archivo',sans-serif;
+  font-size:15px;font-weight:600;
+  padding:13px 14px;
+  border-radius:12px;
+  border:2px solid rgba(11,79,68,.25);
+  background:var(--branco);
+  color:var(--verde-profundo);
+  outline:none;
+}
+.modal .acoes{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.fechar-x{
+  float:right;
+  background:none;border:none;
+  font-size:24px;line-height:1;
+  color:rgba(26,26,26,.45);
+  cursor:pointer;
+}
+.carregando{
+  text-align:center;
+  padding:70px 20px;
+  color:var(--verde-profundo);
+  font-weight:600;
+}
+.toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--verde-profundo);color:var(--creme);
+  padding:13px 22px;border-radius:99px;
+  font-size:14px;font-weight:600;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  transition:transform .3s ease;
+  z-index:80;
+  white-space:nowrap;
+}
+.toast.mostrar{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="telaLogin">
+  <div class="caixa-login">
+    <h1>painel nutri click</h1>
+    <p>Digite a senha para acessar os leads</p>
+    <input type="password" id="inpSenha" placeholder="Senha" onkeydown="if(event.key==='Enter')entrar()">
+    <div class="erro-login" id="erroLogin">Senha incorreta. Tente novamente.</div>
+    <button class="btn btn-principal" style="width:100%" onclick="entrar()">Entrar</button>
+  </div>
+</div>
+
+<!-- ============ TOPO ============ -->
+<header class="topo">
+  <div class="topo-inner">
+    <h1>leads · <span>nutri click</span></h1>
+    <div class="abas">
+      <button class="btn btn-suave ativo" id="abaCards" onclick="trocarVisao('cards')">Cards</button>
+      <button class="btn btn-suave" id="abaKanban" onclick="trocarVisao('kanban')">Kanban</button>
+      <button class="btn btn-suave" onclick="carregarLeads()" title="Atualizar">↻</button>
+    </div>
+    <div class="busca" id="areaBusca">
+      <input type="text" id="inpBusca" placeholder="Buscar lead por nome..." oninput="renderizar()">
+    </div>
+  </div>
+</header>
+
+<!-- ============ RESUMO ============ -->
+<div class="resumo" id="resumo"></div>
+
+<!-- ============ CONTEÚDO ============ -->
+<main class="area">
+  <div class="carregando" id="carregando">Carregando leads...</div>
+  <div class="grade-cards" id="visaoCards" style="display:none"></div>
+  <div class="kanban" id="visaoKanban" style="display:none"></div>
+</main>
+
+<!-- ============ MODAL ============ -->
+<div id="fundoModal" onclick="if(event.target===this)fecharModal()">
+  <div class="modal" id="conteudoModal"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ================== CONFIGURAÇÕES ==================
+var URL_BACKEND = "https://script.google.com/macros/s/AKfycbzy-CgDfHUPTKfUkbZdoIa2Qh59v6kCMOlIlXeeZs-gsucqod3LqldZPL804OHlzVLprQ/exec";
+
+var COLUNAS_KANBAN = [
+  "Esperando contato",
+  "Qualificado",
+  "Diagnóstico Enviado",
+  "Reunião Agendada",
+  "Converteu",
+  "Desqualificado",
+  "Nutrição"
+];
+
+var CORES_STATUS = {
+  "Esperando contato":  {bg:"#E3E9E7", tx:"#0B4F44"},
+  "Qualificado":        {bg:"#D5F0EA", tx:"#0B4F44"},
+  "Diagnóstico Enviado":{bg:"#DCEBFA", tx:"#1D4E78"},
+  "Reunião Agendada":   {bg:"#F3E8FA", tx:"#5B2D77"},
+  "Converteu":          {bg:"#57C4AF", tx:"#06352D"},
+  "Desqualificado":     {bg:"#F5DCDC", tx:"#7A2222"},
+  "Nutrição":           {bg:"#FBEFD6", tx:"#6B4E0E"}
+};
+
+var senha = "";
+var leads = [];
+var visao = "cards";
+var leadAberto = null;
+
+// ================== LOGIN ==================
+function entrar(){
+  var tentativa = document.getElementById('inpSenha').value;
+  document.getElementById('erroLogin').classList.remove('mostrar');
+  fetch(URL_BACKEND + "?senha=" + encodeURIComponent(tentativa))
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if(res.ok){
+        senha = tentativa;
+        sessionStorage.setItem('nutriclick_painel_senha', senha);
+        document.getElementById('telaLogin').style.display = 'none';
+        leads = res.leads || [];
+        aposCarregar();
+      } else {
+        document.getElementById('erroLogin').classList.add('mostrar');
+      }
+    })
+    .catch(function(){
+      document.getElementById('erroLogin').textContent = 'Erro de conexão. Tente novamente.';
+      document.getElementById('erroLogin').classList.add('mostrar');
+    });
+}
+
+// Sessão já autenticada nesta aba
+(function(){
+  var salva = sessionStorage.getItem('nutriclick_painel_senha');
+  if(salva){
+    document.getElementById('inpSenha').value = salva;
+    entrar();
+  }
+})();
+
+// ================== CARREGAR ==================
+function carregarLeads(){
+  document.getElementById('carregando').style.display = 'block';
+  fetch(URL_BACKEND + "?senha=" + encodeURIComponent(senha))
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if(res.ok){ leads = res.leads || []; aposCarregar(); }
+    })
+    .catch(function(){ mostrarToast('Erro ao atualizar. Verifique a conexão.'); });
+}
+
+function aposCarregar(){
+  document.getElementById('carregando').style.display = 'none';
+  renderResumo();
+  renderizar();
+}
+
+// ================== HELPERS ==================
+function ehIncompleto(l){ return String(l.quiz_completo).trim() !== 'Sim'; }
+function statusDe(l){
+  var s = String(l.status || '').trim();
+  return COLUNAS_KANBAN.indexOf(s) !== -1 ? s : "Esperando contato";
+}
+function telLimpo(t){ return String(t||'').replace(/\D/g,''); }
+function fmtTel(t){
+  var v = telLimpo(t);
+  if(v.length === 11) return '(' + v.slice(0,2) + ') ' + v.slice(2,3) + ' ' + v.slice(3,7) + '-' + v.slice(7);
+  if(v.length === 10) return '(' + v.slice(0,2) + ') ' + v.slice(2,6) + '-' + v.slice(6);
+  return t || '';
+}
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function mostrarToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('mostrar');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.classList.remove('mostrar'); }, 2600);
+}
+
+// ================== RESUMO ==================
+function renderResumo(){
+  var total = leads.length;
+  var incompletos = leads.filter(ehIncompleto).length;
+  var esperando = leads.filter(function(l){ return statusDe(l) === 'Esperando contato'; }).length;
+  var reunioes = leads.filter(function(l){ return statusDe(l) === 'Reunião Agendada'; }).length;
+  var convertidos = leads.filter(function(l){ return statusDe(l) === 'Converteu'; }).length;
+  document.getElementById('resumo').innerHTML =
+    caixaResumo(total,'Total de leads') +
+    caixaResumo(incompletos,'Incompletos') +
+    caixaResumo(esperando,'Esperando contato') +
+    caixaResumo(reunioes,'Reuniões agendadas') +
+    caixaResumo(convertidos,'Converteram');
+}
+function caixaResumo(n,rot){
+  return '<div class="caixa"><div class="num">'+n+'</div><div class="rot">'+rot+'</div></div>';
+}
+
+// ================== RENDER ==================
+function trocarVisao(v){
+  visao = v;
+  document.getElementById('abaCards').classList.toggle('ativo', v==='cards');
+  document.getElementById('abaKanban').classList.toggle('ativo', v==='kanban');
+  document.getElementById('areaBusca').style.display = v==='cards' ? 'block' : 'none';
+  renderizar();
+}
+
+function renderizar(){
+  document.getElementById('visaoCards').style.display = visao==='cards' ? 'grid' : 'none';
+  document.getElementById('visaoKanban').style.display = visao==='kanban' ? 'flex' : 'none';
+  if(visao === 'cards') renderCards();
+  else renderKanban();
+}
+
+function linkInstagramDe(l){
+  var user = String(l.instagram||'').replace(/@/g,'').trim();
+  return user ? 'https://instagram.com/' + user : '';
+}
+function linkWhatsDe(l){
+  var tel = telLimpo(l.telefone);
+  return tel ? 'https://wa.me/55' + tel : '';
+}
+
+function htmlCard(l, draggable){
+  var st = statusDe(l);
+  var c = CORES_STATUS[st];
+  var inc = ehIncompleto(l);
+  var insta = linkInstagramDe(l);
+  var whats = linkWhatsDe(l);
+  return '<div class="lead-card'+(inc?' incompleto':'')+'"'+
+    (draggable ? ' draggable="true" ondragstart="aoArrastar(event,\''+esc(l.id_lead)+'\')" ondragend="fimArrasto(event)"' : '')+
+    ' onclick="abrirModal(\''+esc(l.id_lead)+'\')">'+
+    '<div class="nome">'+(esc(l.nome) || 'Sem nome')+'</div>'+
+    '<div class="info">'+esc(fmtTel(l.telefone))+'</div>'+
+    '<div class="info">'+esc(l.instagram)+'</div>'+
+    '<div class="info">'+esc(l.email)+'</div>'+
+    '<span class="badge" style="background:'+c.bg+';color:'+c.tx+'">'+st+'</span>'+
+    (inc ? '<span class="tag-incompleto">Incompleto</span>' : '')+
+    '<div class="card-acoes">'+
+      '<button class="mini mini-pdf" title="Exportar PDF" draggable="false" '+
+        'onclick="event.stopPropagation();exportarPDF(\''+esc(l.id_lead)+'\')">'+
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15l3 3 3-3"/></svg>'+
+        'PDF</button>'+
+      (insta ?
+      '<a class="mini mini-insta" title="Abrir Instagram" draggable="false" href="'+insta+'" target="_blank" rel="noopener" '+
+        'onclick="event.stopPropagation()">'+
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>'+
+        'Insta</a>' : '')+
+      (whats ?
+      '<a class="mini mini-whats" title="Chamar no WhatsApp" draggable="false" href="'+whats+'" target="_blank" rel="noopener" '+
+        'onclick="event.stopPropagation()">'+
+        '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>'+
+        'Whats</a>' : '')+
+    '</div>'+
+    '</div>';
+}
+
+function renderCards(){
+  var termo = document.getElementById('inpBusca').value.trim().toLowerCase();
+  var lista = leads.slice().reverse().filter(function(l){
+    return !termo || String(l.nome||'').toLowerCase().indexOf(termo) !== -1;
+  });
+  var alvo = document.getElementById('visaoCards');
+  if(lista.length === 0){
+    alvo.innerHTML = '<div class="vazio" style="grid-column:1/-1">'+
+      (leads.length===0 ? 'Nenhum lead ainda. Assim que alguém responder o quiz, aparece aqui.' : 'Nenhum lead encontrado com esse nome.')+
+      '</div>';
+    return;
+  }
+  alvo.innerHTML = lista.map(function(l){ return htmlCard(l,false); }).join('');
+}
+
+function renderKanban(){
+  var alvo = document.getElementById('visaoKanban');
+  alvo.innerHTML = COLUNAS_KANBAN.map(function(col){
+    var doGrupo = leads.filter(function(l){ return statusDe(l) === col; }).reverse();
+    var c = CORES_STATUS[col];
+    return '<div class="coluna" data-coluna="'+esc(col)+'" '+
+      'ondragover="event.preventDefault();this.classList.add(\'arrastando-sobre\')" '+
+      'ondragleave="this.classList.remove(\'arrastando-sobre\')" '+
+      'ondrop="aoSoltar(event,\''+esc(col)+'\')">'+
+      '<div class="coluna-titulo" style="color:'+c.tx+'"><span>'+col+'</span><span class="cont">'+doGrupo.length+'</span></div>'+
+      doGrupo.map(function(l){ return htmlCard(l,true); }).join('')+
+      '</div>';
+  }).join('');
+}
+
+// ================== DRAG AND DROP ==================
+var idArrastando = null;
+function aoArrastar(ev, id){
+  idArrastando = id;
+  ev.target.classList.add('arrastando');
+  ev.dataTransfer.effectAllowed = 'move';
+}
+function fimArrasto(ev){ ev.target.classList.remove('arrastando'); }
+function aoSoltar(ev, coluna){
+  ev.preventDefault();
+  ev.currentTarget.classList.remove('arrastando-sobre');
+  if(!idArrastando) return;
+  mudarStatus(idArrastando, coluna);
+  idArrastando = null;
+}
+
+// ================== STATUS ==================
+function mudarStatus(idLead, novoStatus){
+  var lead = leads.find(function(l){ return String(l.id_lead) === String(idLead); });
+  if(!lead || statusDe(lead) === novoStatus) return;
+  lead.status = novoStatus; // atualização otimista
+  renderResumo();
+  renderizar();
+  fetch(URL_BACKEND, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({ acao:'atualizarStatus', senha:senha, id_lead:idLead, status:novoStatus })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(res){
+    if(res.ok) mostrarToast('Status atualizado: ' + novoStatus);
+    else { mostrarToast('Erro ao salvar status'); carregarLeads(); }
+  })
+  .catch(function(){ mostrarToast('Status salvo localmente. Verifique a conexão.'); });
+}
+
+// ================== EXPORTAR PDF ==================
+function exportarPDF(idLead){
+  var l = leads.find(function(x){ return String(x.id_lead) === String(idLead); });
+  if(!l) return;
+  var st = statusDe(l);
+  var insta = linkInstagramDe(l);
+  var whats = linkWhatsDe(l);
+
+  function linha(rotulo, valor){
+    if(valor === undefined || valor === null || String(valor).trim() === '') return '';
+    return '<tr><td class="rot">'+esc(rotulo)+'</td><td>'+esc(valor)+'</td></tr>';
+  }
+  function linhaLink(rotulo, url){
+    if(!url) return '';
+    return '<tr><td class="rot">'+esc(rotulo)+'</td><td><a href="'+esc(url)+'">'+esc(url)+'</a></td></tr>';
+  }
+
+  var docHtml = '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">'+
+    '<title>Lead - '+esc(l.nome||'Sem nome')+' - Nutri Click</title>'+
+    '<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Fraunces:opsz,wght@9..144,900&display=swap" rel="stylesheet">'+
+    '<style>'+
+    '*{margin:0;padding:0;box-sizing:border-box}'+
+    'body{font-family:Archivo,sans-serif;color:#1A1A1A;padding:40px}'+
+    '.cabecalho{background:#0B4F44;color:#F2EDE0;border-radius:16px;padding:26px 28px;margin-bottom:24px}'+
+    '.cabecalho .marca{font-family:Fraunces,serif;font-weight:900;font-size:20px;text-transform:lowercase;color:#57C4AF;margin-bottom:10px}'+
+    '.cabecalho h1{font-family:Fraunces,serif;font-weight:900;font-size:30px;text-transform:lowercase}'+
+    '.cabecalho .sub{font-size:13px;opacity:.8;margin-top:6px}'+
+    '.status{display:inline-block;background:#57C4AF;color:#06352D;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding:6px 14px;border-radius:99px;margin-top:12px}'+
+    'h2{font-family:Fraunces,serif;font-weight:900;font-size:17px;text-transform:lowercase;color:#0B4F44;margin:22px 0 10px}'+
+    'table{width:100%;border-collapse:collapse}'+
+    'td{padding:9px 12px;font-size:13px;border-bottom:1px solid rgba(11,79,68,.12);vertical-align:top}'+
+    'td.rot{width:190px;font-weight:700;color:#0B4F44;text-transform:uppercase;font-size:11px;letter-spacing:.04em}'+
+    'a{color:#0B4F44}'+
+    '.rodape{margin-top:34px;font-size:11px;color:rgba(26,26,26,.5);text-align:center}'+
+    '@media print{body{padding:16px}.cabecalho{-webkit-print-color-adjust:exact;print-color-adjust:exact}.status{-webkit-print-color-adjust:exact;print-color-adjust:exact}}'+
+    '</style></head><body>'+
+
+    '<div class="cabecalho">'+
+      '<div class="marca">nutri click</div>'+
+      '<h1>'+esc((l.nome||'sem nome').toLowerCase())+'</h1>'+
+      '<div class="sub">Diagnóstico Gratuito de Presença Online · Ficha do lead</div>'+
+      '<span class="status">'+esc(st)+'</span>'+
+      (ehIncompleto(l) ? ' <span class="status" style="background:#F0B65B;color:#5c3d00">Quiz incompleto</span>' : '')+
+    '</div>'+
+
+    '<h2>contato</h2><table>'+
+    linha('Nome', l.nome)+
+    linha('Telefone / WhatsApp', fmtTel(l.telefone))+
+    linhaLink('Link do WhatsApp', whats)+
+    linha('E-mail', l.email)+
+    linha('Instagram', l.instagram)+
+    linhaLink('Link do Instagram', insta)+
+    '</table>'+
+
+    '<h2>dores</h2><table>'+
+    linha('Dores marcadas', l.dores || 'Não respondeu')+
+    linha('Dor (outro)', l.dor_outro)+
+    '</table>'+
+
+    '<h2>presença digital</h2><table>'+
+    linha('Tem site?', l.tem_site || 'Não respondeu')+
+    linhaLink('Link do site', l.link_site)+
+    linha('Tem Google Meu Negócio?', l.tem_google_meu_negocio || 'Não respondeu')+
+    linhaLink('Link do Google Meu Negócio', l.link_google_meu_negocio)+
+    linha('Tem TikTok?', l.tem_tiktok || 'Não respondeu')+
+    linhaLink('Link do TikTok', l.link_tiktok)+
+    linha('Tem canal no YouTube?', l.tem_youtube || 'Não respondeu')+
+    linhaLink('Link do YouTube', l.link_youtube)+
+    '</table>'+
+
+    '<h2>registro</h2><table>'+
+    linha('Entrou em', l.data_criacao)+
+    linha('Última atualização', l.ultima_atualizacao)+
+    linha('Etapa do quiz', l.etapa_atual)+
+    linha('Quiz completo', l.quiz_completo)+
+    linha('ID do lead', l.id_lead)+
+    '</table>'+
+
+    '<div class="rodape">Nutri Click · Marketing para nutricionistas · Documento interno</div>'+
+    '<script>window.addEventListener("load",function(){setTimeout(function(){window.print()},400)});<\/script>'+
+    '</body></html>';
+
+  var janela = window.open('', '_blank');
+  if(!janela){
+    mostrarToast('Libere pop-ups para exportar o PDF');
+    return;
+  }
+  janela.document.write(docHtml);
+  janela.document.close();
+}
+
+// ================== MODAL ==================
+function abrirModal(idLead){
+  var l = leads.find(function(x){ return String(x.id_lead) === String(idLead); });
+  if(!l) return;
+  leadAberto = l;
+  var st = statusDe(l);
+
+  function dado(rotulo, valor, ehLink){
+    if(!valor) return '';
+    var v = ehLink
+      ? '<a href="'+esc(valor)+'" target="_blank" rel="noopener">'+esc(valor)+'</a>'
+      : esc(valor);
+    return '<div class="dado"><div class="rotulo">'+rotulo+'</div>'+v+'</div>';
+  }
+
+  var linkInsta = '';
+  if(l.instagram){
+    var user = String(l.instagram).replace('@','').trim();
+    linkInsta = '<div class="dado"><div class="rotulo">Instagram</div>'+
+      '<a href="https://instagram.com/'+esc(user)+'" target="_blank" rel="noopener">'+esc(l.instagram)+'</a></div>';
+  }
+
+  var tel = telLimpo(l.telefone);
+  var linkWhats = tel ? 'https://wa.me/55'+tel : '';
+
+  document.getElementById('conteudoModal').innerHTML =
+    '<button class="fechar-x" onclick="fecharModal()">×</button>'+
+    '<h2>'+(esc(l.nome)||'sem nome')+'</h2>'+
+    '<div class="sub">Entrou em '+esc(l.data_criacao)+' · Última atualização '+esc(l.ultima_atualizacao)+
+    (ehIncompleto(l) ? ' · <strong style="color:#b06a00">Quiz incompleto ('+esc(l.etapa_atual)+')</strong>' : '')+'</div>'+
+
+    dado('Telefone', fmtTel(l.telefone), false)+
+    dado('E-mail', l.email, false)+
+    linkInsta+
+    dado('Dores', l.dores, false)+
+    dado('Dor (outro)', l.dor_outro, false)+
+    dado('Site ('+esc(l.tem_site||'-')+')', l.link_site, true)+
+    (l.tem_site==='Não' ? '<div class="dado"><div class="rotulo">Site</div>Não tem</div>' : '')+
+    dado('Google Meu Negócio ('+esc(l.tem_google_meu_negocio||'-')+')', l.link_google_meu_negocio, true)+
+    (l.tem_google_meu_negocio==='Não' ? '<div class="dado"><div class="rotulo">Google Meu Negócio</div>Não tem</div>' : '')+
+    dado('TikTok ('+esc(l.tem_tiktok||'-')+')', l.link_tiktok, true)+
+    (l.tem_tiktok==='Não' ? '<div class="dado"><div class="rotulo">TikTok</div>Não tem</div>' : '')+
+    dado('YouTube ('+esc(l.tem_youtube||'-')+')', l.link_youtube, true)+
+    (l.tem_youtube==='Não' ? '<div class="dado"><div class="rotulo">YouTube</div>Não tem</div>' : '')+
+
+    '<div class="campo-status"><label>Status do lead</label>'+
+    '<select id="selStatus" onchange="mudarStatusModal()">'+
+    COLUNAS_KANBAN.map(function(c){
+      return '<option value="'+esc(c)+'"'+(c===st?' selected':'')+'>'+c+'</option>';
+    }).join('')+
+    '</select></div>'+
+
+    '<div class="acoes">'+
+    (linkWhats ? '<a class="btn btn-whats" href="'+linkWhats+'" target="_blank" rel="noopener">Chamar no WhatsApp</a>' : '')+
+    '<button class="btn btn-principal" onclick="exportarPDF(\''+esc(l.id_lead)+'\')">Exportar PDF</button>'+
+    '<button class="btn btn-suave" onclick="fecharModal()">Fechar</button>'+
+    '</div>';
+
+  document.getElementById('fundoModal').classList.add('aberto');
+}
+
+function mudarStatusModal(){
+  if(!leadAberto) return;
+  mudarStatus(leadAberto.id_lead, document.getElementById('selStatus').value);
+}
+
+function fecharModal(){
+  document.getElementById('fundoModal').classList.remove('aberto');
+  leadAberto = null;
+}
+</script>
+</body>
+</html>
